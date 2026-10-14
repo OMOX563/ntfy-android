@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <color name="md_theme_primary">#338574</color>
+    <color name="md_theme_primary">#0B5FCC</color>
     <color name="md_theme_onPrimary">#FFFFFF</color>
-    <color name="md_theme_primaryContainer">#A0F2DD</color>
-    <color name="md_theme_onPrimaryContainer">#005144</color>
+    <color name="md_theme_primaryContainer">#D6E3FF</color>
+    <color name="md_theme_onPrimaryContainer">#001B3F</color>
     <color name="md_theme_secondary">#4B635C</color>
     <color name="md_theme_onSecondary">#FFFFFF</color>
     <color name="md_theme_secondaryContainer">#CDE8DF</color>
@@ -27,7 +27,7 @@
     <color name="md_theme_scrim">#000000</color>
     <color name="md_theme_inverseSurface">#2B3230</color>
     <color name="md_theme_inverseOnSurface">#F0F0F0</color>
-    <color name="md_theme_inversePrimary">#84D6C2</color>
+    <color name="md_theme_inversePrimary">#4A8AE8</color>
     <color name="md_theme_primaryFixed">#A0F2DD</color>
     <color name="md_theme_onPrimaryFixed">#00201A</color>
     <color name="md_theme_primaryFixedDim">#84D6C2</color>
@@ -142,7 +142,7 @@
     <color name="md_theme_surfaceContainerHigh_highContrast">#CFD6D2</color>
     <color name="md_theme_surfaceContainerHighest_highContrast">#C1C8C5</color>
 
-    <color name="action_bar">#338574</color> <!-- md_theme_primary (light) -->
+    <color name="action_bar">#0B5FCC</color> <!-- md_theme_primary (light) -->
     <color name="detail_activity_background">#EEEEEE</color> <!-- Light gray for detail activity in light mode -->
 
     <!-- Chip colors -->
