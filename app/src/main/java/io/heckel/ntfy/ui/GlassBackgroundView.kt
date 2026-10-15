@@ -475,6 +475,9 @@ class GlassBackgroundView @JvmOverloads constructor(
         // Adaptive veil, see docs/custom-background.md §2.1. 7:1 instead of the AA minimum
         // of 4.5:1, so there is headroom for ink-muted and for imperfect sampling.
         private const val TARGET_CONTRAST = 7f
+
+        /** Secondary text (timestamps, meta lines) must clear WCAG AA 4.5:1. */
+        private const val TARGET_SECONDARY_CONTRAST = 4.5f
         private const val MAX_VEIL_ALPHA = 0.85f
         private const val BINARY_SEARCH_STEPS = 16
 
