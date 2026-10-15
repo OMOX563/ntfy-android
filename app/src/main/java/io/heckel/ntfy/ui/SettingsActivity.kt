@@ -1,11 +1,13 @@
 package io.heckel.ntfy.ui
 
 import android.Manifest
+import android.app.ActivityManager
 import android.app.AlarmManager
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -151,6 +153,7 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
 
     override fun onResume() {
         super.onResume()
+        findViewById<GlassBackgroundView>(R.id.glass_background)?.refresh() // Custom background, see docs/custom-background.md §5
         if (this::settingsFragment.isInitialized) {
             settingsFragment.updateExactAlarmsPref()
         }
@@ -504,6 +507,8 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
                 }
             }
 
+            setUpBackgroundPreferences()
+
             // Default Base URL
             val appBaseUrl = getString(R.string.app_base_url)
             val defaultBaseUrlPrefId = context?.getString(R.string.settings_general_default_base_url_key) ?: return
@@ -764,6 +769,180 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
             val autoDownload: ListPreference? = findPreference(autoDownloadPrefId)
             autoDownload?.value = autoDownloadSelectionCopy.toString()
             repository.setAutoDownloadMaxSize(autoDownloadSelectionCopy)
+        }
+
+        /**
+         * Wires up the "Background" preferences, see docs/custom-background.md §1 and §4.
+         *
+         * "Choose image" and "Background color" are only shown when they apply to the selected
+         * mode, same pattern as the other conditional preferences in this fragment.
+         */
+        private fun setUpBackgroundPreferences() {
+            val context = context ?: return
+
+            // Background mode (none / atmosphere / custom / solid)
+            val backgroundModePrefId = context.getString(R.string.settings_background_mode_key)
+            val backgroundMode: ListPreference? = findPreference(backgroundModePrefId)
+            backgroundMode?.value = repository.getBackgroundMode()
+            backgroundMode?.preferenceDataStore = object : PreferenceDataStore() {
+                override fun putString(key: String?, value: String?) {
+                    repository.setBackgroundMode(value ?: Repository.BACKGROUND_MODE_DEFAULT)
+                }
+                override fun getString(key: String?, defValue: String?): String {
+                    return repository.getBackgroundMode()
+                }
+            }
+            backgroundMode?.summaryProvider = Preference.SummaryProvider<ListPreference> { pref ->
+                pref.entry ?: getString(R.string.settings_background_mode_title)
+            }
+            backgroundMode?.setOnPreferenceChangeListener { _, newValue ->
+                // Only show "Choose image" and "Background color" for the modes that use them
+                setBackgroundSubPreferencesVisible(newValue.toString())
+                refreshBackground()
+                true
+            }
+
+            // Custom image. OpenDocument (not GetContent) is what makes the URI readable
+            // after a restart, see docs/custom-background.md §2
+            val backgroundImagePrefId = context.getString(R.string.settings_background_image_key)
+            val backgroundImage: Preference? = findPreference(backgroundImagePrefId)
+            backgroundImage?.preferenceDataStore = object : PreferenceDataStore() { } // Dummy store to protect from accidentally overwriting
+            val backgroundImagePicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+                if (uri == null) {
+                    return@registerForActivityResult
+                }
+                try {
+                    requireContext().contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                } catch (e: SecurityException) {
+                    Log.w(TAG, "Could not persist read permission for the background image", e)
+                }
+                repository.setBackgroundImageUri(uri.toString())
+                updateBackgroundImageSummary()
+                setBackgroundSubPreferencesVisible(repository.getBackgroundMode())
+                refreshBackground()
+            }
+            backgroundImage?.onPreferenceClickListener = OnPreferenceClickListener {
+                if (repository.getBackgroundImageUri().isNullOrEmpty()) {
+                    backgroundImagePicker.launch(arrayOf("image/*"))
+                } else {
+                    // A second tap clears the image, so the user does not have to change modes to get rid of it
+                    repository.setBackgroundImageUri(null)
+                    updateBackgroundImageSummary()
+                    refreshBackground()
+                    Toast.makeText(context, R.string.settings_background_image_reset, Toast.LENGTH_SHORT).show()
+                }
+                true
+            }
+
+            // Solid background color. The app has no color picker (and adding one would mean a
+            // new dependency), so this is a list of preset colors, see docs/custom-background.md §4
+            val backgroundColorPrefId = context.getString(R.string.settings_background_color_key)
+            val backgroundColor: ListPreference? = findPreference(backgroundColorPrefId)
+            backgroundColor?.value = repository.getBackgroundSolidColor()
+            backgroundColor?.preferenceDataStore = object : PreferenceDataStore() {
+                override fun putString(key: String?, value: String?) {
+                    repository.setBackgroundSolidColor(value)
+                    refreshBackground()
+                }
+                override fun getString(key: String?, defValue: String?): String? {
+                    return repository.getBackgroundSolidColor()
+                }
+            }
+            backgroundColor?.summaryProvider = Preference.SummaryProvider<ListPreference> { pref ->
+                pref.entry ?: getString(R.string.settings_background_color_entry_default)
+            }
+            backgroundColor?.setOnPreferenceChangeListener { _, _ ->
+                refreshBackground()
+                true
+            }
+
+            // Blur strength in dp, 0 = no blur. The blur itself is applied by GlassBackgroundView
+            val backgroundBlurPrefId = context.getString(R.string.settings_background_blur_key)
+            val backgroundBlur: SeekBarPreference? = findPreference(backgroundBlurPrefId)
+            backgroundBlur?.value = repository.getBackgroundBlur()
+            backgroundBlur?.preferenceDataStore = object : PreferenceDataStore() {
+                override fun putInt(key: String?, value: Int) {
+                    repository.setBackgroundBlur(value)
+                    refreshBackground()
+                }
+                override fun getInt(key: String?, defValue: Int): Int {
+                    return repository.getBackgroundBlur()
+                }
+            }
+            backgroundBlur?.summaryProvider = Preference.SummaryProvider<SeekBarPreference> { pref ->
+                when {
+                    pref.value == 0 -> getString(R.string.settings_background_blur_summary_zero)
+                    blurSkippedOnThisDevice() -> getString(R.string.settings_background_blur_summary_skipped)
+                    else -> getString(R.string.settings_background_blur_summary, pref.value)
+                }
+            }
+            backgroundBlur?.setOnPreferenceChangeListener { _, _ ->
+                refreshBackground()
+                true
+            }
+
+            // Reset all four preferences to their defaults, see docs/custom-background.md §4
+            val backgroundResetPrefId = context.getString(R.string.settings_background_reset_key)
+            val backgroundReset: Preference? = findPreference(backgroundResetPrefId)
+            backgroundReset?.preferenceDataStore = object : PreferenceDataStore() { } // Dummy store to protect from accidentally overwriting
+            backgroundReset?.onPreferenceClickListener = OnPreferenceClickListener {
+                repository.setBackgroundMode(Repository.BACKGROUND_MODE_DEFAULT)
+                repository.setBackgroundImageUri(null)
+                repository.setBackgroundSolidColor(null)
+                repository.setBackgroundBlur(Repository.BACKGROUND_BLUR_DEFAULT)
+                backgroundMode?.value = Repository.BACKGROUND_MODE_DEFAULT
+                backgroundColor?.value = null
+                backgroundBlur?.value = Repository.BACKGROUND_BLUR_DEFAULT
+                updateBackgroundImageSummary()
+                setBackgroundSubPreferencesVisible(Repository.BACKGROUND_MODE_DEFAULT)
+                refreshBackground()
+                true
+            }
+
+            updateBackgroundImageSummary()
+            setBackgroundSubPreferencesVisible(repository.getBackgroundMode())
+        }
+
+        private fun setBackgroundSubPreferencesVisible(mode: String) {
+            val context = context ?: return
+            findPreference(context.getString(R.string.settings_background_image_key))?.isVisible = mode == Repository.BACKGROUND_MODE_CUSTOM
+            findPreference(context.getString(R.string.settings_background_color_key))?.isVisible = mode == Repository.BACKGROUND_MODE_SOLID
+        }
+
+        private fun updateBackgroundImageSummary() {
+            val context = context ?: return
+            val backgroundImage: Preference? = findPreference(context.getString(R.string.settings_background_image_key))
+            val uri = repository.getBackgroundImageUri()
+            backgroundImage?.summary = when {
+                uri.isNullOrEmpty() -> getString(R.string.settings_background_image_summary_none)
+                isImageReadable(uri) -> getString(R.string.settings_background_image_summary_selected)
+                else -> getString(R.string.settings_background_image_summary_unreadable)
+            }
+        }
+
+        private fun isImageReadable(uri: String): Boolean {
+            return try {
+                requireContext().contentResolver.openInputStream(Uri.parse(uri))?.use { true } ?: false
+            } catch (e: Exception) {
+                Log.w(TAG, "Background image cannot be read: $uri", e)
+                false
+            }
+        }
+
+        /**
+         * Redraws the background of the activity this fragment is shown in,
+         * see docs/custom-background.md §5
+         */
+        private fun refreshBackground() {
+            activity?.findViewById<View>(R.id.glass_background)?.refresh()
+        }
+
+        private fun blurSkippedOnThisDevice(): Boolean {
+            val context = context ?: return true
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+                return true
+            }
+            return context.getSystemService(ActivityManager::class.java)?.isLowRamDevice ?: false
         }
 
         fun refreshDefaultServerSummary() {

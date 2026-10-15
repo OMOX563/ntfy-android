@@ -62,6 +62,33 @@
                 app:key="@string/settings_general_message_bar_key"
                 app:title="@string/settings_general_message_bar_title"
                 app:defaultValue="true"/>
+        <!-- Background, see docs/custom-background.md §1 and §4 -->
+        <ListPreference
+                app:key="@string/settings_background_mode_key"
+                app:title="@string/settings_background_mode_title"
+                app:entries="@array/settings_background_mode_entries"
+                app:entryValues="@array/settings_background_mode_values"
+                app:defaultValue="atmosphere"/> <!-- Must match Repository.BACKGROUND_MODE_DEFAULT -->
+        <Preference
+                app:key="@string/settings_background_image_key"
+                app:title="@string/settings_background_image_title"
+                app:summary="@string/settings_background_image_summary_none"/>
+        <ListPreference
+                app:key="@string/settings_background_color_key"
+                app:title="@string/settings_background_color_title"
+                app:entries="@array/settings_background_color_entries"
+                app:entryValues="@array/settings_background_color_values"/>
+        <SeekBarPreference
+                app:key="@string/settings_background_blur_key"
+                app:title="@string/settings_background_blur_title"
+                app:min="0"
+                app:max="12"
+                app:defaultValue="4"
+                app:showSeekBarValue="true"/> <!-- max/defaultValue must match Repository.BACKGROUND_BLUR_MAX/DEFAULT -->
+        <Preference
+                app:key="@string/settings_background_reset_key"
+                app:title="@string/settings_background_reset_title"
+                app:summary="@string/settings_background_reset_summary"/>
     </PreferenceCategory>
     <PreferenceCategory app:title="@string/settings_backup_restore_header">
         <ListPreference

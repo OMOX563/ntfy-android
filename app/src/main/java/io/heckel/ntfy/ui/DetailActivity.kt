@@ -528,6 +528,7 @@ class DetailActivity : AppCompatActivity(), NotificationFragment.NotificationSet
 
     override fun onResume() {
         super.onResume()
+        findViewById<GlassBackgroundView>(R.id.glass_background)?.refresh() // Custom background, see docs/custom-background.md §5
 
         // Mark as "open" so we don't send notifications while this is open
         repository.detailViewSubscriptionId.set(subscriptionId)

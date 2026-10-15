@@ -414,6 +414,54 @@ class Repository(private val sharedPrefs: SharedPreferences, database: Database)
         }
     }
 
+    fun getBackgroundMode(): String {
+        return sharedPrefs.getString(SHARED_PREFS_BACKGROUND_MODE, BACKGROUND_MODE_DEFAULT) ?: BACKGROUND_MODE_DEFAULT
+    }
+
+    fun setBackgroundMode(mode: String) {
+        sharedPrefs.edit {
+            putString(SHARED_PREFS_BACKGROUND_MODE, mode)
+        }
+    }
+
+    fun getBackgroundImageUri(): String? {
+        return sharedPrefs.getString(SHARED_PREFS_BACKGROUND_IMAGE_URI, null)
+    }
+
+    fun setBackgroundImageUri(uri: String?) {
+        sharedPrefs.edit {
+            if (uri == null) {
+                remove(SHARED_PREFS_BACKGROUND_IMAGE_URI)
+            } else {
+                putString(SHARED_PREFS_BACKGROUND_IMAGE_URI, uri)
+            }
+        }
+    }
+
+    fun getBackgroundSolidColor(): String? {
+        return sharedPrefs.getString(SHARED_PREFS_BACKGROUND_SOLID_COLOR, null)
+    }
+
+    fun setBackgroundSolidColor(color: String?) {
+        sharedPrefs.edit {
+            if (color == null) {
+                remove(SHARED_PREFS_BACKGROUND_SOLID_COLOR)
+            } else {
+                putString(SHARED_PREFS_BACKGROUND_SOLID_COLOR, color)
+            }
+        }
+    }
+
+    fun getBackgroundBlur(): Int {
+        return sharedPrefs.getInt(SHARED_PREFS_BACKGROUND_BLUR, BACKGROUND_BLUR_DEFAULT).coerceIn(0, BACKGROUND_BLUR_MAX)
+    }
+
+    fun setBackgroundBlur(blur: Int) {
+        sharedPrefs.edit {
+            putInt(SHARED_PREFS_BACKGROUND_BLUR, blur.coerceIn(0, BACKGROUND_BLUR_MAX))
+        }
+    }
+
     fun getBatteryOptimizationsRemindTime(): Long {
         return sharedPrefs.getLong(SHARED_PREFS_BATTERY_OPTIMIZATIONS_REMIND_TIME, BATTERY_OPTIMIZATIONS_REMIND_TIME_ALWAYS)
     }
@@ -658,6 +706,10 @@ class Repository(private val sharedPrefs: SharedPreferences, database: Database)
         const val SHARED_PREFS_INSISTENT_MAX_PRIORITY_ENABLED = "InsistentMaxPriority"
         const val SHARED_PREFS_RECORD_LOGS_ENABLED = "RecordLogs"
         const val SHARED_PREFS_MESSAGE_BAR_ENABLED = "MessageBarEnabled"
+        const val SHARED_PREFS_BACKGROUND_MODE = "BackgroundMode"
+        const val SHARED_PREFS_BACKGROUND_IMAGE_URI = "BackgroundImageURI"
+        const val SHARED_PREFS_BACKGROUND_SOLID_COLOR = "BackgroundSolidColor"
+        const val SHARED_PREFS_BACKGROUND_BLUR = "BackgroundBlur"
         const val SHARED_PREFS_BATTERY_OPTIMIZATIONS_REMIND_TIME = "BatteryOptimizationsRemindTime" // Timestamp as millis
         const val SHARED_PREFS_WEBSOCKET_REMIND_TIME = "JsonStreamRemindTime" // "Use WebSocket" banner (used to be JSON stream deprecation banner), timestamp as millis
         const val SHARED_PREFS_WEBSOCKET_RECONNECT_REMIND_TIME = "WebSocketReconnectRemindTime" // Timestamp as millis
@@ -671,6 +723,19 @@ class Repository(private val sharedPrefs: SharedPreferences, database: Database)
 
         const val MIN_PRIORITY_USE_GLOBAL = 0
         const val MIN_PRIORITY_ANY = 1
+
+        // Background modes, see docs/custom-background.md §1. Must match values in values.xml
+        const val BACKGROUND_MODE_NONE = "none"
+        const val BACKGROUND_MODE_ATMOSPHERE = "atmosphere"
+        const val BACKGROUND_MODE_CUSTOM = "custom"
+        const val BACKGROUND_MODE_SOLID = "solid"
+
+        // Default is "atmosphere", so the glass effect is visible on first start (docs/custom-background.md §1)
+        const val BACKGROUND_MODE_DEFAULT = BACKGROUND_MODE_ATMOSPHERE
+
+        const val BACKGROUND_BLUR_MIN = 0
+        const val BACKGROUND_BLUR_MAX = 12
+        const val BACKGROUND_BLUR_DEFAULT = 4
 
         const val MUTED_UNTIL_SHOW_ALL = 0L
         const val MUTED_UNTIL_FOREVER = 1L

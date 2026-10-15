@@ -399,6 +399,7 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
 
     override fun onResume() {
         super.onResume()
+        findViewById<GlassBackgroundView>(R.id.glass_background)?.refresh() // Custom background, see docs/custom-background.md §5
         showHideNotificationMenuItems()
         showHideConnectionErrorMenuItem(repository.getConnectionDetails())
         showHideNoNetworkBanner()

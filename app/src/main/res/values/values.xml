@@ -25,6 +25,12 @@
     <string name="settings_general_language_key" translatable="false">Language</string>
     <string name="settings_general_dynamic_colors_key" translatable="false">DynamicColors</string>
     <string name="settings_general_message_bar_key" translatable="false">MessageBarEnabled</string>
+    <!-- Background, see docs/custom-background.md §1 and §4. Values must match Repository -->
+    <string name="settings_background_mode_key" translatable="false">BackgroundMode</string>
+    <string name="settings_background_image_key" translatable="false">BackgroundImageURI</string>
+    <string name="settings_background_color_key" translatable="false">BackgroundSolidColor</string>
+    <string name="settings_background_blur_key" translatable="false">BackgroundBlur</string>
+    <string name="settings_background_reset_key" translatable="false">BackgroundReset</string>
     <string name="settings_backup_restore_backup_key" translatable="false">Backup</string>
     <string name="settings_backup_restore_restore_key" translatable="false">Restore</string>
     <string name="settings_advanced_broadcast_key" translatable="false">BroadcastEnabled</string>
@@ -224,5 +230,43 @@
         <item>-1</item>
         <item>1</item>
         <item>2</item>
+    </string-array>
+
+    <!-- Background modes, see docs/custom-background.md §1.
+         Values must match Repository.BACKGROUND_MODE_* -->
+    <string-array name="settings_background_mode_entries">
+        <item>@string/settings_background_mode_entry_none</item>
+        <item>@string/settings_background_mode_entry_atmosphere</item>
+        <item>@string/settings_background_mode_entry_custom</item>
+        <item>@string/settings_background_mode_entry_solid</item>
+    </string-array>
+    <string-array name="settings_background_mode_values">
+        <item>none</item>
+        <item>atmosphere</item>
+        <item>custom</item>
+        <item>solid</item>
+    </string-array>
+
+    <!-- Preset background colors for the "solid" mode, see docs/custom-background.md §4.
+         There is no color picker dialog: the project ships none, and adding one would mean a
+         new dependency. Values are #AARRGGBB, the format Color.parseColor() takes. -->
+    <string-array name="settings_background_color_entries">
+        <item>@string/settings_background_color_entry_default</item>
+        <item>@string/settings_background_color_entry_mist_blue</item>
+        <item>@string/settings_background_color_entry_mint_green</item>
+        <item>@string/settings_background_color_entry_lavender</item>
+        <item>@string/settings_background_color_entry_warm_sand</item>
+        <item>@string/settings_background_color_entry_cloud_gray</item>
+        <item>@string/settings_background_color_entry_charcoal</item>
+    </string-array>
+    <string-array name="settings_background_color_values">
+        <!-- Same as bg_base, which is the light/dark aware page background -->
+        <item>#EEF2F7</item>
+        <item>#D6E4FF</item>
+        <item>#D3F0DF</item>
+        <item>#E7DEFF</item>
+        <item>#FBE7D0</item>
+        <item>#E4E7EC</item>
+        <item>#1F2937</item>
     </string-array>
 </resources>

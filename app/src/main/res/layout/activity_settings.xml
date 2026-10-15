@@ -5,6 +5,13 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
+    <io.heckel.ntfy.ui.GlassBackgroundView
+        android:id="@+id/glass_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@null"
+        android:importantForAccessibility="no" />
+
     <include
         android:id="@+id/app_bar_drawer"
         layout="@layout/app_bar_drawer"
