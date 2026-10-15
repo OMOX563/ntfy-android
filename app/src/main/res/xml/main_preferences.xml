@@ -83,9 +83,12 @@
              androidx.preference 的 SeekBarPreference 没有 app:min / app:max，
              用 app: 会报 "attribute max (aka cc.omox.fxxkpush:max) not found"。
 
-             showSeekBarValue 是**系统私有属性**（android: 命名空间下 is private），
-             公开 SDK 里没有；AndroidX 自己的开关叫 app:seekBarValueShown（小写 s）。
-             取值显示改走 app:summary（字符串里有 %1$d 占位，SettingsActivity 里动态填）。
+             关于「在滑块旁显示当前数值」：试过两种写法都被 AAPT 拒绝——
+               android:showSeekBarValue  → "attribute ... is private"（系统私有属性）
+               app:seekBarValueShown      → "attribute ... not found"（preference-ktx 1.2.1 无此 attr）
+             两条路在公开 SDK + 当前依赖版本下都不可用，因此**不显示滑块数值**，
+             改由 app:summary 承担（%1$d 由 SettingsActivity 动态填）。
+             若将来升级 androidx.preference 出现了正式开关，这里再接回去。
 
              max/defaultValue 须与 Repository.BACKGROUND_BLUR_MAX /
              BACKGROUND_BLUR_DEFAULT 保持一致。 -->
@@ -95,7 +98,6 @@
                 android:min="0"
                 android:max="12"
                 android:defaultValue="4"
-                app:seekBarValueShown="true"
                 app:summary="@string/settings_background_blur_summary" />
         <Preference
                 app:key="@string/settings_background_reset_key"
