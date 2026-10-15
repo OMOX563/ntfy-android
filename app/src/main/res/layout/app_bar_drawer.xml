@@ -9,9 +9,23 @@
     android:fitsSystemWindows="true"
     app:liftOnScroll="false">
 
+    <!--
+        FxxkPush 液态玻璃 · 顶栏（P3）：**本次刻意不动**
+
+        试过把顶栏换成半透明 glass_bar + titleTextColor=@color/ink，但那条路走不通：
+        主题只有 values/themes.xml 一份（values-night/themes.xml 是空的，靠 Material
+        DayNight 基类处理），colorOnPrimary 是白字，而 toolbar 标题/菜单图标由
+        colorOnPrimary 派生。半透明浅底 + 白字 = 白字白底。
+        要做玻璃顶栏，得整套重做 title/subtitle/menu/navIcon 的 tint 链，
+        那是独立一轮的活，不该塞在 P3 里半吊子交付。
+
+        顶栏保持实色品牌蓝。页面主体（订阅卡片、消息卡片）走玻璃，
+        两者的割裂感靠间距和背景光弧过渡，而不是靠改顶栏颜色。
+    -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize" />
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/md_theme_primary" />
 
 </com.google.android.material.appbar.AppBarLayout>

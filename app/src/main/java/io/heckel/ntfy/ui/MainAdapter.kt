@@ -133,7 +133,11 @@ class MainAdapter(
                 newItemsView.setTextColor(onPrimaryColor)
                 newItemsView.background = countDrawable
             }
-            itemView.setOnClickListener { onClick(subscription) }
+            // FxxkPush P3：根节点已改为玻璃卡片（MaterialCardView），点击与涟漪必须绑到内层
+        // ConstraintLayout——它才带 foreground=?android:attr/selectableItemBackground。
+        // 绑在 itemView（外层卡片）上功能正常但看不到涟漪。
+        val clickTarget = itemView.findViewById<View>(R.id.main_item_click_target)
+        clickTarget.setOnClickListener { onClick(subscription) }
             itemView.setOnLongClickListener { onLongClick(subscription); true }
             if (selected.contains(subscription.id)) {
                 itemView.setBackgroundColor(Colors.itemSelectedBackground(context))

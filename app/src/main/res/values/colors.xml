@@ -166,9 +166,9 @@
     <color name="brand_container">#DCE7FF</color>
 
     <!-- §2.2 玻璃表面 -->
-    <color name="glass_fill">#9EFFFFFF</color>          <!-- #FFFFFF @ 62% -->
+    <color name="glass_fill">#70FFFFFF</color>          <!-- #FFFFFF @ 62% -->
     <color name="glass_fill_strong">#C7FFFFFF</color>    <!-- #FFFFFF @ 78% -->
-    <color name="glass_stroke">#B3FFFFFF</color>         <!-- #FFFFFF @ 70% -->
+    <color name="glass_stroke">#CCFFFFFF</color>         <!-- #FFFFFF @ 70% -->
     <color name="glass_stroke_dim">#140F172A</color>     <!-- #0F172A  @ 8% -->
 
     <!-- §2.3 前景（玻璃上必须过 AA） -->
@@ -185,9 +185,9 @@
     <!-- §2.5 背景与氛围斑（氛围斑透明度 ≤ 8%） -->
     <color name="bg_base">#EEF2F7</color>
     <color name="bg_veil">#66FFFFFF</color>              <!-- #FFFFFF @ 40% 渐层 -->
-    <color name="atmosphere_blob_1">#142C6BED</color>   <!-- brand      @ 8% -->
-    <color name="atmosphere_blob_2">#0F2C6BED</color>   <!-- brand      @ 6% -->
-    <color name="atmosphere_blob_3">#0D1E4FB0</color>   <!-- brand_dim  @ 5% -->
+    <color name="atmosphere_blob_1">#432C6BED</color>   <!-- brand      @ 8% -->
+    <color name="atmosphere_blob_2">#332C6BED</color>   <!-- brand      @ 6% -->
+    <color name="atmosphere_blob_3">#291E4FB0</color>   <!-- brand_dim  @ 5% -->
 
     <!-- 按压反馈叠加色（§2.1 brand @ 12%）：玻璃卡片按下时的静态反馈，缩放回弹动效见 §6，留给 P6 -->
     <color name="card_press_overlay">#1F2C6BED</color>   <!-- brand @ 12%：玻璃卡片按下时的一层极淡品牌色 -->
