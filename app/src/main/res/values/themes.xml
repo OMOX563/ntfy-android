@@ -203,4 +203,10 @@
         <item name="android:textColor">@color/ink_muted</item>
         <item name="android:textSize">@dimen/text_size_meta</item>
     </style>
+
+    <style name="FxxkPushBody" parent="">
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:textSize">@dimen/text_size_body</item>
+        <item name="android:lineHeight">@dimen/text_line_height_body</item>
+    </style>
 </resources>
