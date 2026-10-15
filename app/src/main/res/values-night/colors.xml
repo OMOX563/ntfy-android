@@ -148,43 +148,4 @@
     <!-- Chip colors -->
     <color name="chip_background_color">#2C2C2C</color> <!-- Dark gray background -->
     <color name="chip_background_checked">#4A4A4A</color> <!-- Lighter when selected in dark mode -->
-
-    <!-- ==========================================================================
-         FxxkPush 液态玻璃设计系统 · 色彩令牌（深色）
-         依据 docs/design-system.md §2，与 values/colors.xml 的浅色令牌一一对应。
-         注意：玻璃的 fill/stroke 在深色下是「深色半透明 + 极淡白描边」，
-         不是简单反相——见 §2.2 表格的两套 alpha。
-         ========================================================================== -->
-
-    <!-- §2.1 品牌基色 -->
-    <color name="brand">#8FB6FF</color>
-    <color name="brand_dim">#B8CFF8</color>
-    <color name="brand_container">#1C3A66</color>
-
-    <!-- §2.2 玻璃表面 -->
-    <color name="glass_fill">#941A2230</color>          <!-- #1A2230 @ 58% -->
-    <color name="glass_fill_strong">#B81E2836</color>    <!-- #1E2836 @ 72% -->
-    <color name="glass_stroke">#1FFFFFFF</color>         <!-- #FFFFFF @ 12% -->
-    <color name="glass_stroke_dim">#3D000000</color>     <!-- #000000  @ 24% -->
-
-    <!-- §2.3 前景 -->
-    <color name="ink">#E8EEF7</color>
-    <color name="ink_muted">#94A3B8</color>
-    <color name="ink_faint">#64748B</color>
-
-    <!-- §2.4 语义色 -->
-    <color name="alert_high">#FF6369</color>
-    <color name="alert_mid">#FF8B3D</color>
-    <color name="alert_low">#FFD426</color>
-    <color name="ok">#4CC38A</color>
-
-    <!-- §2.5 背景与氛围斑 -->
-    <color name="bg_base">#0B0F16</color>
-    <color name="bg_veil">#4D000000</color>              <!-- #000000 @ 30% 渐层 -->
-    <color name="atmosphere_blob_1">#148FB6FF</color>   <!-- brand     @ 8% -->
-    <color name="atmosphere_blob_2">#0F8FB6FF</color>   <!-- brand     @ 6% -->
-    <color name="atmosphere_blob_3">#0DB8CFF8</color>   <!-- brand_dim @ 5% -->
-
-    <!-- 按压反馈叠加色（§2.1 brand @ 12%）：玻璃卡片按下时的静态反馈，缩放回弹动效见 §6，留给 P6 -->
-    <color name="card_press_overlay">#1F8FB6FF</color>   <!-- brand @ 12%：玻璃卡片按下时的一层极淡品牌色 -->
 </resources>

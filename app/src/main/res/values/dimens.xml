@@ -1,45 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="fab_margin">24dp</dimen>
-
-    <!-- ==========================================================================
-         FxxkPush 液态玻璃设计系统 · 圆角与间距令牌
-         依据 docs/design-system.md §3。本段为新增，不改动上面既有的 fab_margin。
-         ========================================================================== -->
-
-    <!-- §3 圆角 -->
-    <dimen name="radius_card">20dp</dimen>    <!-- 主卡片 -->
-    <dimen name="radius_inner">14dp</dimen>   <!-- 卡片内块（附件框、按钮组） -->
-    <dimen name="radius_chip">999dp</dimen>   <!-- 徽章 / 标签 -->
-    <dimen name="radius_fab">18dp</dimen>     <!-- FAB（Material3 默认 16dp，+2 更"软"） -->
-
-    <!-- §3 间距 -->
-    <dimen name="gap_xs">4dp</dimen>          <!-- 图标与文字 -->
-    <dimen name="gap_s">8dp</dimen>           <!-- 同组元素 -->
-    <dimen name="gap_m">14dp</dimen>          <!-- 卡片内分组 -->
-    <dimen name="gap_l">22dp</dimen>          <!-- 卡片之间 -->
-    <dimen name="page_pad">16dp</dimen>       <!-- 页面左右留白 -->
-
-    <!-- §5.1 玻璃描边宽度：文档固定 1dp 内描边 -->
-    <dimen name="glass_stroke_width">1dp</dimen>
-
-    <!-- ==========================================================================
-         FxxkPush 液态玻璃设计系统 · 字体层级令牌
-         依据 docs/design-system.md §4（不引入新字体，用系统字体）。
-         ========================================================================== -->
-    <dimen name="text_size_display">28sp</dimen>    <!-- Display 28sp/700 -->
-    <dimen name="text_size_title">20sp</dimen>      <!-- Title 20sp/650 -->
-    <dimen name="text_size_card_title">16sp</dimen> <!-- Card Title 16sp/650 -->
-    <dimen name="text_size_body">15sp</dimen>       <!-- Body 15sp/400 -->
-    <dimen name="text_size_meta">13sp</dimen>       <!-- Meta 13sp/400 -->
-    <dimen name="text_size_micro">11sp</dimen>      <!-- Micro 11sp/500 -->
-
-        <!-- §4 正文行高 1.45：15sp × 1.45 = 21.75sp -->
-        <dimen name="text_line_height_body">21.75sp</dimen>
-
-        <!-- §4 的字重 650 与字距 +0.02em 不做成资源：
-             · android:textStyle 只有 normal/bold，无法表达 650；
-             · 两者都直接在布局里写（fontFamily=sans-serif-medium +
-               fontVariationSettings="'wght' 650"、android:letterSpacing="0.02"），
-               避免引入一个只有一处使用的 dimen 资源。 -->
-    </resources>
+</resources>

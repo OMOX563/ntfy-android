@@ -494,7 +494,4 @@
     <string name="connection_alert_snoozed_toast">连接丢失警报推迟了 %1$d 小时</string>
     <string name="channel_subscriber_notification_no_network_title">正在等待网络</string>
     <string name="channel_subscriber_notification_no_network_text">当 Wi-Fi 或移动数据可用时通知将恢复</string>
-
-    <!-- 消息卡片菜单按钮的无障碍描述（design-system.md §8：所有图标按钮需有 contentDescription） -->
-    <string name="detail_item_menu_button_description">消息选项</string>
 </resources>
