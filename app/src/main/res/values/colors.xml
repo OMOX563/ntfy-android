@@ -152,4 +152,43 @@
     <!-- Remove black status bar in Action mode: https://stackoverflow.com/a/79456725 -->
     <color name="abc_decor_view_status_guard" tools:override="true">@android:color/transparent</color>
     <color name="abc_decor_view_status_guard_light" tools:override="true">@android:color/transparent</color>
+
+    <!-- ==========================================================================
+         FxxkPush 液态玻璃设计系统 · 色彩令牌（浅色）
+         依据 docs/design-system.md §2。本段全部为「新增」令牌，
+         上面既有的 md_theme_* 色板与 action_bar / chip_* 条目一律不删不改。
+         alpha 一律以 #AARRGGBB 表达（Android color 资源原生支持）。
+         ========================================================================== -->
+
+    <!-- §2.1 品牌基色 -->
+    <color name="brand">#2C6BED</color>
+    <color name="brand_dim">#1E4FB0</color>
+    <color name="brand_container">#DCE7FF</color>
+
+    <!-- §2.2 玻璃表面 -->
+    <color name="glass_fill">#9EFFFFFF</color>          <!-- #FFFFFF @ 62% -->
+    <color name="glass_fill_strong">#C7FFFFFF</color>    <!-- #FFFFFF @ 78% -->
+    <color name="glass_stroke">#B3FFFFFF</color>         <!-- #FFFFFF @ 70% -->
+    <color name="glass_stroke_dim">#140F172A</color>     <!-- #0F172A  @ 8% -->
+
+    <!-- §2.3 前景（玻璃上必须过 AA） -->
+    <color name="ink">#0F172A</color>
+    <color name="ink_muted">#475569</color>
+    <color name="ink_faint">#7C8899</color>
+
+    <!-- §2.4 语义色（沿用 ntfy 优先级语义） -->
+    <color name="alert_high">#E5484D</color>
+    <color name="alert_mid">#C2410C</color>
+    <color name="alert_low">#996F00</color>
+    <color name="ok">#268257</color>
+
+    <!-- §2.5 背景与氛围斑（氛围斑透明度 ≤ 8%） -->
+    <color name="bg_base">#EEF2F7</color>
+    <color name="bg_veil">#66FFFFFF</color>              <!-- #FFFFFF @ 40% 渐层 -->
+    <color name="atmosphere_blob_1">#142C6BED</color>   <!-- brand      @ 8% -->
+    <color name="atmosphere_blob_2">#0F2C6BED</color>   <!-- brand      @ 6% -->
+    <color name="atmosphere_blob_3">#0D1E4FB0</color>   <!-- brand_dim  @ 5% -->
+
+    <!-- 按压反馈叠加色（§2.1 brand @ 12%）：玻璃卡片按下时的静态反馈，缩放回弹动效见 §6，留给 P6 -->
+    <color name="card_press_overlay">#1F2C6BED</color>   <!-- brand @ 12%：玻璃卡片按下时的一层极淡品牌色 -->
 </resources>
