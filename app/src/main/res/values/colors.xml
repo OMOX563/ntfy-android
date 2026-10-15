@@ -178,9 +178,9 @@
 
     <!-- §2.4 语义色（沿用 ntfy 优先级语义） -->
     <color name="alert_high">#E5484D</color>
-    <color name="alert_mid">#F76B15</color>
-    <color name="alert_low">#F5C518</color>
-    <color name="ok">#30A46C</color>
+    <color name="alert_mid">#C2410C</color>
+    <color name="alert_low">#996F00</color>
+    <color name="ok">#268257</color>
 
     <!-- §2.5 背景与氛围斑（氛围斑透明度 ≤ 8%） -->
     <color name="bg_base">#EEF2F7</color>
