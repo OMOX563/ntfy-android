@@ -11,6 +11,9 @@
     每个斑自带 gradient（centerColor 极淡 → transparent），并用
     <item> 的 android:left/top/right/bottom 把它们钉在页面的三个角落。
   · 三个斑的 alpha 取 atmosphere_blob_1/2/3（8% / 6% / 5%），均 ≤ 文档 8% 上限。
+  · <item> 的 left/top/right/bottom 是 dimension 属性，**不接受百分比**
+    （AAPT 会报 "'70%' is incompatible with attribute bottom (attr) dim"），
+    必须写成 dp。斑的大小因此按 400dp 宽的手机屏折算成固定 dp。
   · 浅色 / 深色两套由 values/ 与 values-night/ 的 atmosphere_blob_* 自动切换。
 
   踩坑记录（2026-10-15，CI 首次构建失败）：
@@ -28,7 +31,7 @@
     </item>
 
     <!-- 氛围斑 1：左上角，brand @ 8% -->
-    <item android:left="-120dp" android:top="-140dp" android:right="60%" android:bottom="70%">
+    <item android:left="-120dp" android:top="-140dp" android:right="260dp" android:bottom="240dp">
         <shape android:shape="oval">
             <gradient
                 android:type="radial"
@@ -42,7 +45,7 @@
     </item>
 
     <!-- 氛围斑 2：右上偏中，brand @ 6% -->
-    <item android:left="45%" android:top="8%" android:right="-140dp" android:bottom="62%">
+    <item android:left="200dp" android:top="60dp" android:right="-140dp" android:bottom="220dp">
         <shape android:shape="oval">
             <gradient
                 android:type="radial"
@@ -56,7 +59,7 @@
     </item>
 
     <!-- 氛围斑 3：左下角，brand-dim @ 5% -->
-    <item android:left="-100dp" android:top="55%" android:right="72%" android:bottom="-160dp">
+    <item android:left="-100dp" android:top="240dp" android:right="180dp" android:bottom="-160dp">
         <shape android:shape="oval">
             <gradient
                 android:type="radial"
