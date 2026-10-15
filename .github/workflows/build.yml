@@ -49,7 +49,16 @@ jobs:
           KEY_PASS: ${{ secrets.KEY_PASS }}
         run: |
           set -o pipefail
-          ./gradlew :app:assembleFdroidRelease --stacktrace --info 2>&1 | tail -200
+          # 全量落盘：gh/gh-CLI 与网页日志都会截断长输出，编译错误正文常被吃掉。
+          # 落成文件后 grep 出 e: file 与 .kt:行:列，作为 artifact 上传，便于精确取错误。
+          ./gradlew :app:assembleFdroidRelease --stacktrace --info > build-full.log 2>&1 || {
+            echo "===== 编译错误摘要 ====="
+            grep -nE "^e: file:|\.kt:[0-9]+:[0-9]+|error:|What went wrong|^> " build-full.log | head -40 || true
+            echo "===== 末尾 60 行 ====="
+            tail -60 build-full.log
+            exit 1
+          }
+          tail -5 build-full.log
 
       - name: Rename APK
         run: |
@@ -58,6 +67,15 @@ jobs:
           cp "$SRC" "FxxkPush-${VERSION}-android.apk"
           echo "APK_PATH=FxxkPush-${VERSION}-android.apk" >> $GITHUB_ENV
           ls -lh "FxxkPush-${VERSION}-android.apk"
+
+      - name: Upload build log (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build-full.log
+          retention-days: 7
+          if-no-files-found: ignore
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
