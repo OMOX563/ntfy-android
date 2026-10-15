@@ -191,4 +191,16 @@
         <item name="android:windowEnterAnimation">@anim/slide_in_bottom</item>
         <item name="android:windowExitAnimation">@anim/slide_out_bottom</item>
     </style>
+<style name="FxxkPushGlassBackground" parent="">
+        <item name="android:background">@drawable/glass_card</item>
+    </style>
+
+    <style name="FxxkPushGlassInner" parent="">
+        <item name="android:background">@drawable/glass_inner</item>
+    </style>
+
+    <style name="FxxkPushMeta" parent="">
+        <item name="android:textColor">@color/ink_muted</item>
+        <item name="android:textSize">@dimen/text_size_meta</item>
+    </style>
 </resources>
