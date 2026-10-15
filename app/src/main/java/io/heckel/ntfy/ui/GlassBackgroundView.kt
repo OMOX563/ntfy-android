@@ -202,12 +202,29 @@ class GlassBackgroundView @JvmOverloads constructor(
         if (darkTheme) {
             canvas.drawColor(ContextCompat.getColor(context, R.color.bg_veil))
         }
-        val veil = adaptiveVeil(image, ContextCompat.getColor(context, R.color.glass_fill), ContextCompat.getColor(context, R.color.ink))
+        val veil = adaptiveVeil(
+            image,
+            ContextCompat.getColor(context, R.color.glass_fill),
+            ContextCompat.getColor(context, R.color.ink),
+            ContextCompat.getColor(context, R.color.ink_muted)
+        )
         if (veil != Color.TRANSPARENT) {
             Log.d(TAG, "Adaptive veil: #${Integer.toHexString(veil)}")
             canvas.drawColor(veil)
         }
         return image
+    }
+
+    /**
+     * True when the card surface clears **both** contrast targets: [TARGET_CONTRAST]
+     * against body text and [TARGET_SECONDARY_CONTRAST] against secondary text.
+     * Both must hold — solving on the stricter one alone is not enough, because the
+     * two foreground colors sit at different luminances and either can be the binding
+     * constraint depending on the background image.
+     */
+    private fun meetsTargets(cardColor: Int, ink: Int, inkMuted: Int): Boolean {
+        return contrastRatio(cardColor, ink) >= TARGET_CONTRAST &&
+            contrastRatio(cardColor, inkMuted) >= TARGET_SECONDARY_CONTRAST
     }
 
     /**
@@ -218,21 +235,24 @@ class GlassBackgroundView @JvmOverloads constructor(
      *
      * The smallest sufficient strength wins, so the background stays as visible as possible.
      *
-     * Note: the target is ink, exactly as docs §2.1 specifies. Measured worst case (light theme,
-     * black image) comes out at white @4.7%, ink 7.08:1, but ink_muted only 2.97:1 — below the
-     * AA 4.5:1 of docs/design-system.md §8. Targeting ink_muted instead would fix that, but that
-     * is not what the doc asks for, so it is left as the decision for whoever owns the doc.
+     * The veil is solved against **both** [TARGET_CONTRAST] (body text) and
+     * [TARGET_SECONDARY_CONTRAST] (secondary text); see [meetsTargets].
+     * Solving on `ink` alone left `ink_muted` at ~3.0:1 on a pure-black
+     * background — technically short of the 4.5:1 that design-system.md §8
+     * requires for secondary text, and unreadable in practice. The extra cost
+     * is negligible for ordinary photos (0–2% veil); only extreme images
+     * need a strong veil, where a dimmed image is the right trade.
      */
-    private fun adaptiveVeil(image: Bitmap, glassFill: Int, ink: Int): Int {
+    private fun adaptiveVeil(image: Bitmap, glassFill: Int, ink: Int, inkMuted: Int): Int {
         val backgroundColor = averageColor(image)
         val cardColor = composite(glassFill, backgroundColor)
-        if (contrastRatio(cardColor, ink) >= TARGET_CONTRAST) {
+        if (meetsTargets(cardColor, ink, inkMuted)) {
             return Color.TRANSPARENT // Nothing to do, the image is already readable
         }
         // Black first: a veil over a bright image is the case that actually happens, and
         // in the light theme only a white veil can lift the text at all (docs §2.1)
         for (veilColor in intArrayOf(Color.BLACK, Color.WHITE)) {
-            val veil = solveVeil(veilColor, backgroundColor, glassFill, ink)
+            val veil = solveVeil(veilColor, backgroundColor, glassFill, ink, inkMuted)
             if (veil != Color.TRANSPARENT) {
                 return veil
             }
@@ -250,20 +270,20 @@ class GlassBackgroundView @JvmOverloads constructor(
      * plain binary search: [low] is known to be too weak, [high] is the weakest strength not yet
      * ruled out. Returns [Color.TRANSPARENT] if even [MAX_VEIL_ALPHA] does not get there.
      */
-    private fun solveVeil(veilColor: Int, backgroundColor: Int, glassFill: Int, ink: Int): Int {
+    private fun solveVeil(veilColor: Int, backgroundColor: Int, glassFill: Int, ink: Int, inkMuted: Int): Int {
         var low = 0f
         var high = MAX_VEIL_ALPHA
         repeat(BINARY_SEARCH_STEPS) {
             val strength = (low + high) / 2f
             val veil = withAlpha(veilColor, (strength * 255f).roundToInt())
-            if (contrastRatio(composite(glassFill, composite(veil, backgroundColor)), ink) >= TARGET_CONTRAST) {
+            if (meetsTargets(composite(glassFill, composite(veil, backgroundColor)), ink, inkMuted)) {
                 high = strength
             } else {
                 low = strength
             }
         }
         val veil = withAlpha(veilColor, (high * 255f).roundToInt())
-        return if (contrastRatio(composite(glassFill, composite(veil, backgroundColor)), ink) >= TARGET_CONTRAST) {
+        return if (meetsTargets(composite(glassFill, composite(veil, backgroundColor)), ink, inkMuted)) {
             veil
         } else {
             Color.TRANSPARENT
