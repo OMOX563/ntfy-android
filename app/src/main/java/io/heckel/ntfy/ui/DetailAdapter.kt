@@ -13,7 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.cardview.widget.CardView
+import com.google.android.material.card.MaterialCardView
 import androidx.constraintlayout.helper.widget.Flow
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
@@ -92,7 +92,10 @@ class DetailAdapter(private val activity: Activity, private val lifecycleScope: 
         RecyclerView.ViewHolder(itemView) {
         private var notification: Notification? = null
         private val layout: View = itemView.findViewById(R.id.detail_item_layout)
-        private val cardView: CardView = itemView.findViewById(R.id.detail_item_card)
+                // P2 液态玻璃：卡片根节点已改为 MaterialCardView（androidx CardView 会覆盖
+                // android:background，glass_card 挂在它上面会被静默吃掉）。类型随之调整，
+                // setCardBackgroundColor / 点击监听 / 涟漪 API 都一样，未改动任何逻辑。
+                private val cardView: MaterialCardView = itemView.findViewById(R.id.detail_item_card)
         private val priorityImageView: ImageView = itemView.findViewById(R.id.detail_item_priority_image)
         private val dateView: TextView = itemView.findViewById(R.id.detail_item_date_text)
         private val titleView: TextView = itemView.findViewById(R.id.detail_item_title_text)
@@ -147,13 +150,23 @@ class DetailAdapter(private val activity: Activity, private val lifecycleScope: 
             if (unmatchedTags.isNotEmpty()) {
                 tagsView.visibility = View.VISIBLE
                 tagsView.text = context.getString(R.string.detail_item_tags, unmatchedTags.joinToString(", "))
+                // P2 液态玻璃：标签行的胶囊底（glass_chip）与 Micro 字级在布局里，
+                // 这里只保证回收复用时颜色跟着主题走（不残留上一条消息的染色）。
+                tagsView.setTextColor(ContextCompat.getColor(context, R.color.ink_muted))
             } else {
                 tagsView.visibility = View.GONE
             }
+            // P2 液态玻璃：卡片面由 FxxkPushCard 样式给 glass_fill + 1dp glass_stroke 描边，
+            // 这里两个分支都要显式设色：RecyclerView 会复用 ViewHolder，else 分支如果什么都不做，
+            // 上一条处于选中态的消息留下的实心色就会留在复用出来的卡片上。
+            // 未选中时填回 glass_fill（与样式同值），选中态沿用原来的换色方式，行为不变。
+            // 按压反馈走 MaterialCardView 原生的 app:rippleColor（card_press_overlay），
+            // 在布局/样式里静态声明，不需要在 bind 里挂 onTouchListener；
+            // §6 的 scale 0.96 + 回弹动效留给 P6，本轮只做静态样式绑定。
             if (selected.contains(notification.id)) {
                 cardView.setCardBackgroundColor(Colors.cardSelectedBackgroundColor(context))
             } else {
-                cardView.setCardBackgroundColor(Colors.cardBackgroundColor(context))
+                cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.glass_fill))
             }
             val attachment = notification.attachment
             val attachmentFileStat = maybeFileStat(context, attachment?.contentUri)
@@ -173,28 +186,29 @@ class DetailAdapter(private val activity: Activity, private val lifecycleScope: 
             return message
         }
 
+        /*
+         * P2 液态玻璃：priority 图标统一染语义色（docs/design-system.md §2.4）。
+         * 原来的 ic_priority_* 矢量各自带死色（灰 / 蓝 / 暗红），浅色深色两套主题下都不成体系。
+         * 只改 tint，不改「显示还是隐藏」的判断：priority 3（PRIORITY_DEFAULT）原本就不出图。
+         * alert-mid 对应 priority 3，按原逻辑也就用不上，留着给 P3/P4 的状态点复用。
+         * 末位的 else 是纯视觉兜底：服务端给到 1-5 之外的值时不至于让复用回收的卡片
+         * 残留上一条消息的图标（旧代码在这里什么都不做）。
+         */
         private fun renderPriority(context: Context, notification: Notification) {
-            when (notification.priority) {
-                PRIORITY_MIN -> {
-                    priorityImageView.visibility = View.VISIBLE
-                    priorityImageView.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_priority_1_24dp))
-                }
-                PRIORITY_LOW -> {
-                    priorityImageView.visibility = View.VISIBLE
-                    priorityImageView.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_priority_2_24dp))
-                }
-                PRIORITY_DEFAULT -> {
-                    priorityImageView.visibility = View.GONE
-                }
-                PRIORITY_HIGH -> {
-                    priorityImageView.visibility = View.VISIBLE
-                    priorityImageView.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_priority_4_24dp))
-                }
-                PRIORITY_MAX -> {
-                    priorityImageView.visibility = View.VISIBLE
-                    priorityImageView.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_priority_5_24dp))
-                }
+            val (drawableRes, tintRes) = when (notification.priority) {
+                PRIORITY_MIN -> R.drawable.ic_priority_1_24dp to R.color.alert_low
+                PRIORITY_LOW -> R.drawable.ic_priority_2_24dp to R.color.alert_low
+                PRIORITY_HIGH -> R.drawable.ic_priority_4_24dp to R.color.alert_high
+                PRIORITY_MAX -> R.drawable.ic_priority_5_24dp to R.color.alert_high
+                else -> 0 to 0 // PRIORITY_DEFAULT = 3（默认优先级不出图）与越界值
             }
+            if (drawableRes == 0) {
+                priorityImageView.visibility = View.GONE
+                return
+            }
+            priorityImageView.visibility = View.VISIBLE
+            priorityImageView.setImageDrawable(ContextCompat.getDrawable(context, drawableRes)?.mutate())
+            priorityImageView.setColorFilter(ContextCompat.getColor(context, tintRes))
         }
 
         private fun maybeRenderAttachment(context: Context, notification: Notification, attachmentFileStat: FileInfo?) {
