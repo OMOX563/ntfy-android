@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  FxxkPush 液态玻璃 · 页面氛围背景
+  依据 docs/design-system.md §2.5：
+      页面底 bg-base → 彩色氛围斑（2-3 个低透明度 radial，透明度 ≤ 8%）→ 玻璃卡片浮于其上。
+
+  实现说明（Android shape 的硬限制与取舍）：
+  · shape 的 <gradient> 只有 linear/radial/sweep 三种，且一个 shape 只能带一个渐变，
+    无法在同一个 shape 里把「底色 + 多个不同位置的 radial 斑」叠起来。
+  · 因此用 <layer-list>：最底层是纯色 bg_base，上面叠三个 radial oval 斑，
+    每个斑自带自己的 gradient（centerColor 极淡 → transparent），并用
+    <item android:left/top/right/bottom> 把它们钉在页面的三个角落，
+    从而近似出「角落发光的氛围斑」，而不是一整片均匀染色。
+  · 三个斑的 alpha 分别取 atmosphere_blob_1/2/3（8% / 6% / 5%），
+    均 ≤ 文档规定的 8% 上限；斑用 shape="oval" + radial gradient 模拟圆形光晕，
+    边缘通过 gradient 的透明收尾做到无硬边。
+  · 浅色 / 深色两套氛围色由 values/ 与 values-night/ 的 atmosphere_blob_* 自动切换。
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 页面底 -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/bg_base" />
+        </shape>
+    </item>
+    <!-- 氛围斑 1：左上，brand @ 8% -->
+    <item>
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="55%p"
+                android:centerColor="@color/atmosphere_blob_1"
+                android:startColor="@color/atmosphere_blob_1"
+                android:centerY="0.18"
+                android:centerX="0.18"
+                android:endColor="@android:color/transparent" />
+        </shape>
+    </item>
+    <!-- 氛围斑 2：右下，brand @ 6% -->
+    <item android:gravity="bottom|right" android:width="88%p" android:height="88%p">
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="50%p"
+                android:centerColor="@color/atmosphere_blob_2"
+                android:startColor="@color/atmosphere_blob_2"
+                android:endColor="@android:color/transparent" />
+        </shape>
+    </item>
+    <!-- 氛围斑 3：右上，brand-dim @ 5% -->
+    <item android:gravity="top|right" android:width="70%p" android:height="70%p">
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="50%p"
+                android:centerColor="@color/atmosphere_blob_3"
+                android:startColor="@color/atmosphere_blob_3"
+                android:endColor="@android:color/transparent" />
+        </shape>
+    </item>
+</layer-list>

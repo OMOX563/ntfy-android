@@ -16,12 +16,30 @@
         <item name="colorOnError">@color/md_theme_onError</item>
         <item name="colorErrorContainer">@color/md_theme_errorContainer</item>
         <item name="colorOnErrorContainer">@color/md_theme_onErrorContainer</item>
-        <item name="android:colorBackground">@color/md_theme_background</item>
-        <item name="colorOnBackground">@color/md_theme_onBackground</item>
+
+        <!--
+            FxxkPush 液态玻璃令牌接入（docs/design-system.md §2）
+            · android:colorBackground → bg_base（§2.5）：页面底色，玻璃卡片靠它透出氛围
+            · colorOnBackground / colorOnSurface → ink（§2.3）：正文 12:1，满足 §8 的 AA 要求
+            · colorOnSurfaceVariant → ink_muted（§2.3）：次要文字 ≥ 4.5:1
+
+            两处刻意保持原样，理由如下（不是漏改）：
+            · colorSurface 仍指向 md_theme_surface，不改成半透明的 glass_fill：
+              toolbar / dialog / menu / 状态栏都默认假设 surface 不透明，塞半透明色会让
+              这些组件透底叠加；Material 的 surface↔onSurface 配色契约也是这么定的。
+              玻璃只出现在显式引用 @drawable/glass_* 或 @color/glass_* 的卡片/内块/徽章上。
+            · colorPrimary 仍指向 md_theme_primary，不改成 brand：
+              brand #2C6BED 在浅色底 bg_base 上对比度只有 4.15:1，达不到正文链接需要的 4.5:1
+              （现有 #0B5FCC 是 5.2:1）。文档 §2.1 本来就把「品牌文字（浅底）」单列为
+              brand-dim #1E4FB0 —— 品牌色做强调块、brand-dim 做文字，是文档自己的分工。
+              因此 P0 只提供 brand 令牌，P3/P4 需要品牌色时按 §2.1 的用途列取用。
+        -->
+        <item name="android:colorBackground">@color/bg_base</item>
+        <item name="colorOnBackground">@color/ink</item>
         <item name="colorSurface">@color/md_theme_surface</item>
-        <item name="colorOnSurface">@color/md_theme_onSurface</item>
+        <item name="colorOnSurface">@color/ink</item>
         <item name="colorSurfaceVariant">@color/md_theme_surfaceVariant</item>
-        <item name="colorOnSurfaceVariant">@color/md_theme_onSurfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/ink_muted</item>
         <item name="colorOutline">@color/md_theme_outline</item>
         <item name="colorOutlineVariant">@color/md_theme_outlineVariant</item>
         <item name="colorSurfaceInverse">@color/md_theme_inverseSurface</item>
@@ -72,6 +90,81 @@
         <item name="tint">?attr/colorOnPrimary</item>
     </style>
 
+    <!--
+        FxxkPush 液态玻璃卡片样式（新增；@style/CardView 本轮原样保留不动）。
+        依据 docs/design-system.md §5.1 + §2.2 + §3：
+        · cardElevation / cardMaxElevation = 0dp，阴影改由一层极淡投影承担（§5.1）
+        · cardCornerRadius 走 radius_card（20dp，§3）
+        · cardBackgroundColor = glass_fill，即 §2.2 的「卡片主面」（浅 62% 白 / 深 58% 深蓝灰）
+        · strokeWidth = 1dp、strokeColor = glass_stroke，即 §5.1 的 1px 内描边
+        · cardPreventCornerOverlap / cardUseCompatPadding 关掉：原布局留着它们是为了配合
+          androidx CardView 的 3dp 圆角，玻璃卡片圆角更大，不再需要那点补偿内边距
+
+        与文档示例的唯一差异（实现方式，不是设计）：文档 §5.1 写的是
+        cardBackgroundColor=@android:color/transparent + android:background=@drawable/glass_card。
+        MaterialCardView 在构造时会无条件 ViewCompat.setBackground(自己, MaterialShapeDrawable)，
+        和 androidx CardView 一样会覆盖 android:background —— 而把半透明色当 cardBackgroundColor
+        也不画任何东西。因此改走 MaterialCardView 原生的填充 + 描边通道：渲染结果与文档描述
+        完全一致（半透明玻璃面 + 1px 内描边 + 20dp 圆角），但不会被覆盖。
+        @drawable/glass_card 本身照 §5.1 建好，P3-P5 给普通 View 铺玻璃面时直接用。
+    -->
+    <style name="FxxkPushCard" parent="Widget.Material3.CardView.Filled">
+        <item name="cardElevation">0dp</item>
+        <item name="cardMaxElevation">0dp</item>
+        <item name="cardCornerRadius">@dimen/radius_card</item>
+        <item name="cardBackgroundColor">@color/glass_fill</item>
+        <item name="strokeWidth">@dimen/glass_stroke_width</item>
+        <item name="strokeColor">@color/glass_stroke</item>
+        <item name="cardPreventCornerOverlap">false</item>
+        <item name="cardUseCompatPadding">false</item>
+        <!-- 按压反馈：§6 的 scale 动效留给 P6，本轮只保留一层极淡的品牌色涟漪 -->
+        <item name="rippleColor">@color/card_press_overlay</item>
+    </style>
+
+    <!-- 玻璃面（供普通 View 的 android:background 引用）：§5.1 的 glass_card + 1dp 内描边 -->
+    <style name="FxxkPushGlassBackground" parent="">
+        <item name="android:background">@drawable/glass_card</item>
+    </style>
+
+    <!-- 卡片内块（附件框等）：§2.2 glass-fill-strong + §3 radius-inner 14dp -->
+    <style name="FxxkPushGlassInner" parent="">
+        <item name="android:background">@drawable/glass_inner</item>
+    </style>
+
+    <!--
+        玻璃徽章（标签行）：§3 radius-chip 999dp + §4 Micro 11sp/500 字距 +0.02em + §2.3 ink-muted。
+        字重 500 用 sans-serif-medium 表达（android:textStyle 只有 normal/bold 两个档）。
+    -->
+    <style name="FxxkPushBadge" parent="">
+        <item name="android:background">@drawable/glass_chip</item>
+        <item name="android:textColor">@color/ink_muted</item>
+        <item name="android:textSize">@dimen/text_size_micro</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+
+    <!-- 卡片标题：§4 Card Title 16sp/650。650 无法用 textStyle 表达，改用可变字重（minSdk 26 支持） -->
+    <style name="FxxkPushCardTitle" parent="">
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:textSize">@dimen/text_size_card_title</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontVariationSettings">'wght' 650</item>
+    </style>
+
+    <!-- 正文：§4 Body 15sp/400，行高 1.45（15sp × 1.45 = 21.75sp） -->
+    <style name="FxxkPushBody" parent="">
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:textSize">@dimen/text_size_body</item>
+        <item name="android:lineHeight">@dimen/text_line_height_body</item>
+    </style>
+
+    <!-- 次要文字 / 时间戳 / 附件信息：§4 Meta 13sp/400 + §2.3 ink-muted -->
+    <style name="FxxkPushMeta" parent="">
+        <item name="android:textColor">@color/ink_muted</item>
+        <item name="android:textSize">@dimen/text_size_meta</item>
+    </style>
+
+    <!-- 既有样式，保持原样（不删不改） -->
     <style name="CardView" parent="@style/Widget.Material3.CardView.Elevated" />
 
     <style name="CardViewBackground" />

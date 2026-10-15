@@ -568,4 +568,7 @@
     <string name="client_certificate_dialog_error_wrong_password">Wrong password or invalid PKCS#12 file</string>
     <string name="client_certificate_dialog_error_invalid_p12_password">Invalid password or corrupted PKCS#12 file</string>
     <string name="client_certificate_dialog_error_invalid_url">Invalid service URL</string>
+
+    <!-- 消息卡片菜单按钮的无障碍描述（design-system.md §8：所有图标按钮需有 contentDescription） -->
+    <string name="detail_item_menu_button_description">Message options</string>
 </resources>

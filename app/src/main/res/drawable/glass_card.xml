@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  FxxkPush 液态玻璃 · 主卡片面
+  依据 docs/design-system.md §5.1（基础层）与 §2.2（玻璃表面色板）。
+  fill/stroke 全部走 @color 引用，浅色与深色两套由 values/ 与 values-night/ 自动解析，
+  本文件不需要 drawable-night 变体。
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/glass_fill" />
+    <stroke
+        android:width="@dimen/glass_stroke_width"
+        android:color="@color/glass_stroke" />
+    <corners android:radius="@dimen/radius_card" />
+</shape>
