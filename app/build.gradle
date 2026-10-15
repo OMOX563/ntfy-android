@@ -27,9 +27,12 @@ android {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
 
-        buildFeatures {
-            buildConfig true
-        }
+    }
+
+    buildFeatures {
+        buildConfig true
+        // FxxkPush P2 重做：Compose 迁移（UI 层全部重写，内核 Service/WebSocket/Room 不动）
+        compose true
     }
 
     signingConfigs {
@@ -156,4 +159,26 @@ dependencies {
     // Used by Markdown library, R8 complains if these are not here
     implementation "pl.droidsonroids.gif:android-gif-drawable:1.2.31"
     implementation "com.caverock:androidsvg:1.4"
+
+    // FxxkPush P2 重做 · Compose（BOM 锁全套版本，避免逐个对齐）
+    // 这一轮只做**零风险验证**：不改任何业务代码，只让 Compose 能编译。
+    // 探针 ComposeProbe.kt 编译通过后即删，真正的 UI 重写在后续阶段铺开。
+    def compose_bom = platform("androidx.compose:compose-bom:2025.06.01")
+    implementation compose_bom
+    implementation "androidx.compose.ui:ui"
+    implementation "androidx.compose.ui:ui-graphics"
+    implementation "androidx.compose.foundation:foundation"
+    implementation "androidx.compose.runtime:runtime"
+    implementation "androidx.compose.material3:material3"
+    implementation "androidx.compose.material:material-icons-core"
+    implementation "androidx.compose.material:material-icons-extended"
+    implementation "androidx.compose.ui:ui-tooling-preview"
+    debugImplementation "androidx.compose.ui:ui-tooling"
+
+    // Activity 里直接 setContent 需要 ComponentActivity（AppCompatActivity 已继承）
+    implementation "androidx.activity:activity-compose:1.10.1"
+
+    // LiveData → Compose：ViewModel/LiveData 侧一行 observeAsState 就能接进重组
+    // 不用为了迁移去动内核那套 LiveData（Service/PollWorker 都在用）
+    implementation "androidx.compose.runtime:runtime-livedata"
 }
