@@ -47,7 +47,9 @@ jobs:
           KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
           KEY_ALIAS: fxxkpush
           KEY_PASS: ${{ secrets.KEY_PASS }}
-        run: ./gradlew :app:assembleFdroidRelease
+        run: |
+          set -o pipefail
+          ./gradlew :app:assembleFdroidRelease --stacktrace --info 2>&1 | tail -200
 
       - name: Rename APK
         run: |
