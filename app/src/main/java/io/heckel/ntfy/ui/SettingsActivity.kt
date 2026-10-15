@@ -906,8 +906,11 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
 
         private fun setBackgroundSubPreferencesVisible(mode: String) {
             val context = context ?: return
-            findPreference(context.getString(R.string.settings_background_image_key))?.isVisible = mode == Repository.BACKGROUND_MODE_CUSTOM
-            findPreference(context.getString(R.string.settings_background_color_key))?.isVisible = mode == Repository.BACKGROUND_MODE_SOLID
+            // findPreference<T> 的泛型无法从赋值反推，必须显式标注（与本文件其余 48 处一致）
+            val imagePref: Preference? = findPreference(context.getString(R.string.settings_background_image_key))
+            val colorPref: Preference? = findPreference(context.getString(R.string.settings_background_color_key))
+            imagePref?.isVisible = mode == Repository.BACKGROUND_MODE_CUSTOM
+            colorPref?.isVisible = mode == Repository.BACKGROUND_MODE_SOLID
         }
 
         private fun updateBackgroundImageSummary() {
