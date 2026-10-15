@@ -79,18 +79,24 @@
                 app:title="@string/settings_background_color_title"
                 app:entries="@array/settings_background_color_entries"
                 app:entryValues="@array/settings_background_color_values"/>
-        <!-- min/max/progress/showSeekBarValue 必须用 android: 前缀：
-             androidx.preference 的 SeekBarPreference 没有 app:min / app:max /
-             app:showSeekBarValue 这几个 attr，用 app: 会报
-             "attribute max (aka cc.omox.fxxkpush:max) not found"。
-             max/defaultValue 须与 Repository.BACKGROUND_BLUR_MAX / BACKGROUND_BLUR_DEFAULT 保持一致。 -->
+        <!-- min/max/progress 必须用 android: 前缀：
+             androidx.preference 的 SeekBarPreference 没有 app:min / app:max，
+             用 app: 会报 "attribute max (aka cc.omox.fxxkpush:max) not found"。
+
+             showSeekBarValue 是**系统私有属性**（android: 命名空间下 is private），
+             公开 SDK 里没有；AndroidX 自己的开关叫 app:seekBarValueShown（小写 s）。
+             取值显示改走 app:summary（字符串里有 %1$d 占位，SettingsActivity 里动态填）。
+
+             max/defaultValue 须与 Repository.BACKGROUND_BLUR_MAX /
+             BACKGROUND_BLUR_DEFAULT 保持一致。 -->
         <SeekBarPreference
                 android:key="@string/settings_background_blur_key"
                 android:title="@string/settings_background_blur_title"
                 android:min="0"
                 android:max="12"
                 android:defaultValue="4"
-                android:showSeekBarValue="true" />
+                app:seekBarValueShown="true"
+                app:summary="@string/settings_background_blur_summary" />
         <Preference
                 app:key="@string/settings_background_reset_key"
                 app:title="@string/settings_background_reset_title"
