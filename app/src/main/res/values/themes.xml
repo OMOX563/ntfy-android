@@ -122,19 +122,46 @@
     </style>
 
     <!-- 玻璃面（供普通 View 的 android:background 引用）：§5.1 的 glass_card + 1dp 内描边 -->
+    <style name="FxxkPushGlassBackground" parent="">
+        <item name="android:background">@drawable/glass_card</item>
+    </style>
 
     <!-- 卡片内块（附件框等）：§2.2 glass-fill-strong + §3 radius-inner 14dp -->
+    <style name="FxxkPushGlassInner" parent="">
+        <item name="android:background">@drawable/glass_inner</item>
+    </style>
 
     <!--
         玻璃徽章（标签行）：§3 radius-chip 999dp + §4 Micro 11sp/500 字距 +0.02em + §2.3 ink-muted。
         字重 500 用 sans-serif-medium 表达（android:textStyle 只有 normal/bold 两个档）。
     -->
+    <style name="FxxkPushBadge" parent="">
+        <item name="android:background">@drawable/glass_chip</item>
+        <item name="android:textColor">@color/ink_muted</item>
+        <item name="android:textSize">@dimen/text_size_micro</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
 
     <!-- 卡片标题：§4 Card Title 16sp/650。650 无法用 textStyle 表达，改用可变字重（minSdk 26 支持） -->
+    <style name="FxxkPushCardTitle" parent="">
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:textSize">@dimen/text_size_card_title</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
 
     <!-- 正文：§4 Body 15sp/400，行高 1.45（15sp × 1.45 = 21.75sp） -->
+    <style name="FxxkPushBody" parent="">
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:textSize">@dimen/text_size_body</item>
+        <item name="android:lineHeight">@dimen/text_line_height_body</item>
+    </style>
 
     <!-- 次要文字 / 时间戳 / 附件信息：§4 Meta 13sp/400 + §2.3 ink-muted -->
+    <style name="FxxkPushMeta" parent="">
+        <item name="android:textColor">@color/ink_muted</item>
+        <item name="android:textSize">@dimen/text_size_meta</item>
+    </style>
 
     <!-- 既有样式，保持原样（不删不改） -->
     <style name="CardView" parent="@style/Widget.Material3.CardView.Elevated" />
@@ -190,30 +217,5 @@
     <style name="Animation.App.FullScreenDialog" parent="Animation.AppCompat.Dialog">
         <item name="android:windowEnterAnimation">@anim/slide_in_bottom</item>
         <item name="android:windowExitAnimation">@anim/slide_out_bottom</item>
-    </style>
-<style name="FxxkPushGlassBackground" parent="">
-        <item name="android:background">@drawable/glass_card</item>
-    </style>
-
-    <style name="FxxkPushGlassInner" parent="">
-        <item name="android:background">@drawable/glass_inner</item>
-    </style>
-
-    <style name="FxxkPushMeta" parent="">
-        <item name="android:textColor">@color/ink_muted</item>
-        <item name="android:textSize">@dimen/text_size_meta</item>
-    </style>
-
-    <style name="FxxkPushBody" parent="">
-        <item name="android:textColor">@color/ink</item>
-        <item name="android:textSize">@dimen/text_size_body</item>
-        <item name="android:lineHeight">@dimen/text_line_height_body</item>
-    </style>
-
-    <style name="FxxkPushCardTitle" parent="">
-        <item name="android:textColor">@color/ink</item>
-        <item name="android:textSize">@dimen/text_size_card_title</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:fontVariationSettings">'wght' 650</item>
     </style>
 </resources>
