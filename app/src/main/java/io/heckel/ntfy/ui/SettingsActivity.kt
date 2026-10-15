@@ -934,7 +934,7 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
          * see docs/custom-background.md §5
          */
         private fun refreshBackground() {
-            activity?.findViewById<View>(R.id.glass_background)?.refresh()
+            activity?.findViewById<GlassBackgroundView>(R.id.glass_background)?.refresh()
         }
 
         private fun blurSkippedOnThisDevice(): Boolean {
