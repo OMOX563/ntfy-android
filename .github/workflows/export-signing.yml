@@ -1,0 +1,37 @@
+name: Export signing material (one-shot)
+
+# 一次性工作流：把仓库 Secrets 里的签名材料导出成 artifact。
+# 目的：仓库删除后 Secrets 不可恢复，签名密钥一旦丢失，
+# 新版 APK 就无法覆盖安装到已装旧版的手机上。
+# 用完请删掉本文件。
+
+on:
+  workflow_dispatch:
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build keystore from PEM
+        run: |
+          mkdir -p export
+          echo "${{ secrets.KEY_PEM_B64 }}" | base64 -d > export/key.pem
+          echo "${{ secrets.CERT_PEM_B64 }}" | base64 -d > export/cert.pem
+          openssl pkcs12 -export \
+            -in export/cert.pem -inkey export/key.pem \
+            -out export/fxxkpush.p12 \
+            -name fxxkpush \
+            -passout pass:${{ secrets.KEYSTORE_PASS }} \
+            -keypbe PBE-SHA1-3DES -certpbe PBE-SHA1-3DES -macalg sha1
+          # 把口令也带出来（否则拿到的 p12 打不开）
+          printf 'KEYSTORE_PASS=%s\nKEY_PASS=%s\n' \
+            '${{ secrets.KEYSTORE_PASS }}' '${{ secrets.KEY_PASS }}' > export/passwords.txt
+          keytool -list -keystore export/fxxkpush.p12 \
+            -storepass ${{ secrets.KEYSTORE_PASS }} -storetype PKCS12
+
+      - name: Upload signing material
+        uses: actions/upload-artifact@v4
+        with:
+          name: signing-material
+          path: export/
+          retention-days: 7
